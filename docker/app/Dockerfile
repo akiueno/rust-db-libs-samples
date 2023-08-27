@@ -3,11 +3,15 @@ FROM rust:1.72-alpine
 RUN apk add --no-cache \
         ca-certificates \
         gcc \
-        bash
+        bash \
+        pkgconfig \
+        openssl-dev \
+        musl-dev
 
 ENV RUSTUP_HOME=/usr/local/rustup \
     CARGO_HOME=/usr/local/cargo \
     PATH=/usr/local/cargo/bin:$PATH \
+    OPENSSL_DIR=/usr \
     RUST_VERSION=1.72.0
 
 RUN set -eux; \
@@ -29,4 +33,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN cargo build;
+RUN cargo install cargo-watch; \
+    # postgresに接続用の依存関係しかinstallされないので、例えばsqlx-mysqlなどはinstallされず、少し軽くなる
+    cargo install sqlx-cli --no-default-features --features postgres; \
+    cargo build;
