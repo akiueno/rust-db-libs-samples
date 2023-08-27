@@ -1,0 +1,36 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/app/Dockerfile
+    container_name: rust-app
+    working_dir: /app
+    command: bash
+    tty: true
+    volumes:
+      - ../:/app
+    ports:
+      - 3000:3000
+    depends_on:
+      - postgres
+  postgres:
+    build:
+      context: ..
+      dockerfile: docker/db/Dockerfile
+      target: 'postgres'
+    container_name: rust-postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      TZ: 'Asia/Tokyo'
+volumes:
+  pgdata:
+networks:
+  rust-app-net:
+    driver: bridge
