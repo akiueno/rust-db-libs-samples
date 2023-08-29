@@ -1,0 +1,19 @@
+[env]
+DATABASE_URL = { value = "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}", condition = { env_not_set = ["DATABASE_URL"] } }
+
+[tasks.create]
+command = "sqlx"
+args = ["db", "create", "--database-url", "${DATABASE_URL}"]
+
+[tasks.migrate]
+command = "sqlx"
+args = ["migrate", "run", "--database-url", "${DATABASE_URL}"]
+
+[tasks.watch]
+command = "cargo"
+args = ["watch", "-x", "run"]
+
+[tasks.db]
+run_task = [
+    { name = ["create", "migrate", "watch"] },
+]
