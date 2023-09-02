@@ -5,9 +5,21 @@ DATABASE_URL = { value = "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POS
 command = "sqlx"
 args = ["db", "create", "--database-url", "${DATABASE_URL}"]
 
-[tasks.migrate]
+[tasks.drop]
+command = "sqlx"
+args = ["db", "drop", "--database-url", "${DATABASE_URL}"]
+
+[tasks.migrate_add]
+command = "sqlx"
+args = ["migrate", "add", "-r", "${@}"]
+
+[tasks.migrate_run]
 command = "sqlx"
 args = ["migrate", "run", "--database-url", "${DATABASE_URL}"]
+
+[tasks.migrate_revert]
+command = "sqlx"
+args = ["migrate", "revert", "--database-url", "${DATABASE_URL}"]
 
 [tasks.watch]
 command = "cargo"
