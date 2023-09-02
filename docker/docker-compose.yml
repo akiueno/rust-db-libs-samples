@@ -1,4 +1,11 @@
 version: "3.8"
+x-environment: &environment
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: 5432
+  POSTGRES_DB: postgres
+  TZ: 'Asia/Tokyo'
 services:
   app:
     build:
@@ -8,12 +15,13 @@ services:
     working_dir: /app
     command: bash
     tty: true
+    environment: *environment
     volumes:
       - ../:/app
     ports:
       - 3000:3000
     depends_on:
-      - postgres
+      - postgres  
   postgres:
     build:
       context: ..
@@ -24,13 +32,6 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-      TZ: 'Asia/Tokyo'
+    environment: *environment
 volumes:
   pgdata:
-networks:
-  rust-app-net:
-    driver: bridge

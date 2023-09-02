@@ -33,7 +33,7 @@ WORKDIR /app
 
 COPY . /app
 
-RUN cargo install cargo-watch; \
+RUN cargo install cargo-watch cargo-make; \
     # postgresに接続用の依存関係しかinstallされないので、例えばsqlx-mysqlなどはinstallされず、少し軽くなる
     cargo install sqlx-cli --no-default-features --features postgres; \
     cargo build;
