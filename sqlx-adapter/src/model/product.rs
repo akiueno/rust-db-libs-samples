@@ -12,12 +12,12 @@ pub(crate) struct ProductTable {
 }
 
 impl From<ProductTable> for Product {
-    fn from(product_table: ProductTable) -> Self {
+    fn from(source: ProductTable) -> Self {
         Self::new(
-            Id::new(product_table.id),
-            product_table.name,
-            product_table.price,
-            Id::new(product_table.category_id),
+            Id::new(source.id),
+            source.name,
+            source.price,
+            Id::new(source.category_id),
         )
     }
 }
