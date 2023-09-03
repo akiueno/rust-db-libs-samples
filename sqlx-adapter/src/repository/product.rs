@@ -1,4 +1,4 @@
-use super::RepositoryForSqlx;
+use super::{RepositoryError, RepositoryForSqlx};
 use crate::model::product::ProductTable;
 use async_trait::async_trait;
 use domain::model::product::{NewProduct, Product, UpdateProduct};
@@ -18,13 +18,28 @@ impl ProductRepository for RepositoryForSqlx<Product> {
         .bind(source.get_price())
         .bind(source.get_category_id())
         .fetch_one(&self.pool)
-        .await?;
+        .await
+        .map_err(|e| RepositoryError::Unexpected(e.to_string()))?;
 
         Ok(Product::from(product_table))
     }
 
     async fn find(&self, id: i32) -> anyhow::Result<Product> {
-        todo!()
+        let product_table = sqlx::query_as::<_, ProductTable>(
+            r#"
+            select * from sqlx.product
+            where id = $1
+            "#,
+        )
+        .bind(id)
+        .fetch_one(&self.pool)
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => RepositoryError::NotFound(id),
+            _ => RepositoryError::Unexpected(e.to_string()),
+        })?;
+
+        Ok(Product::from(product_table))
     }
 
     async fn all(&self) -> anyhow::Result<Vec<Product>> {
