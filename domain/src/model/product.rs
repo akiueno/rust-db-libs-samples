@@ -1,3 +1,4 @@
+use super::{product_category::ProductCategory, Id};
 use derive_new::new;
 
 pub struct NewProduct {
@@ -26,8 +27,8 @@ pub struct UpdateProduct {
 
 #[derive(new)]
 pub struct Product {
-    id: i64,
+    id: Id<Product>,
     name: String,
     price: i32,
-    category_id: i64,
+    category_id: Id<ProductCategory>,
 }

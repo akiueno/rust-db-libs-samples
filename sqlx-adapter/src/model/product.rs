@@ -1,5 +1,5 @@
 use chrono::{DateTime, Local};
-use domain::model::product::Product;
+use domain::model::{product::Product, Id};
 
 #[derive(sqlx::FromRow)]
 pub(crate) struct ProductTable {
@@ -14,10 +14,10 @@ pub(crate) struct ProductTable {
 impl From<ProductTable> for Product {
     fn from(product_table: ProductTable) -> Self {
         Self::new(
-            product_table.id,
+            Id::new(product_table.id),
             product_table.name,
             product_table.price,
-            product_table.category_id,
+            Id::new(product_table.category_id),
         )
     }
 }
