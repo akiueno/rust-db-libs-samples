@@ -43,14 +43,58 @@ impl ProductRepository for RepositoryForSqlx<Product> {
     }
 
     async fn all(&self) -> anyhow::Result<Vec<Product>> {
-        todo!()
+        let product_tables = sqlx::query_as::<_, ProductTable>(
+            r#"
+            select * from sqlx.product
+            order by id desc;
+            "#,
+        )
+        .fetch_all(&self.pool)
+        .await
+        .map_err(|e| RepositoryError::Unexpected(e.to_string()))?;
+
+        Ok(product_tables.into_iter().map(Product::from).collect())
     }
 
     async fn update(&self, id: i32, source: UpdateProduct) -> anyhow::Result<Product> {
-        todo!()
+        let old_product = self.find(id).await?;
+        let updated_product = sqlx::query_as::<_, ProductTable>(
+            r#"
+            update sqlx.product
+            set name = $1, price = $2, category_id = $3
+            where id = $4
+            returning *
+            "#,
+        )
+        .bind(source.get_name().as_deref().unwrap_or(old_product.get_name()))
+        .bind(source.get_price().unwrap_or(*old_product.get_price()))
+        .bind(source.get_category_id().unwrap_or(*old_product.get_category_id().get_value()))
+        .bind(id)
+        .fetch_one(&self.pool)
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => RepositoryError::NotFound(id),
+            _ => RepositoryError::Unexpected(e.to_string()),
+        })?;
+
+        Ok(Product::from(updated_product))
     }
 
     async fn delete(&self, id: i32) -> anyhow::Result<()> {
-        todo!()
+        sqlx::query(
+            r#"
+            delete from sqlx.product
+            where id = $1
+            "#,
+        )
+        .bind(id)
+        .execute(&self.pool)
+        .await
+        .map_err(|e| match e {
+            sqlx::Error::RowNotFound => RepositoryError::NotFound(id),
+            _ => RepositoryError::Unexpected(e.to_string()),
+        })?;
+
+        Ok(())
     }
 }
