@@ -15,13 +15,15 @@ services:
     working_dir: /app
     command: bash
     tty: true
-    environment: *environment
+    environment:
+      <<: *environment
+      POSTGRES_URL: "postgresql://postgresql:postgresql@postgresql:5432/postgresql"
     volumes:
       - ../:/app
     ports:
       - 3000:3000
     depends_on:
-      - postgres  
+      - postgres
   postgres:
     build:
       context: ..
