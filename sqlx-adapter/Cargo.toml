@@ -1,5 +1,5 @@
 [package]
-name = "sqlx"
+name = "sqlx-adapter"
 version = "0.1.0"
 edition = "2021"
 
@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.75"
 async-trait = "0.1.73"
+chrono = "0.4.28"
 derive-new = "0.5.9"
 domain = { path = "../domain" }
 sqlx = { version = "0.7.1", features = ["runtime-tokio-native-tls", "postgres", "any", "chrono"]}
