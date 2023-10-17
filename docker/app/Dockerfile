@@ -20,7 +20,8 @@ RUN set -eux; \
         *) echo >&2 "unsupported architecture: ${dpkgArch}"; exit 1 ;; \
     esac; \
     cargo install cargo-watch cargo-make; \
-    cargo install sqlx-cli --no-default-features --features mysql; \
+    cargo install sqlx-cli --no-default-features --features postgres; \
+    cargo install sea-orm-cli; \
     cargo build --release; \
     chmod -R +x ./target/release/*;
 

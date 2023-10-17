@@ -1,7 +1,7 @@
 version: "3.8"
 x-environment: &environment
-  POSTGRES_USER: postgres
-  POSTGRES_PASSWORD: postgres
+  POSTGRES_USER: docker
+  POSTGRES_PASSWORD: password
   POSTGRES_HOST: postgres
   POSTGRES_PORT: 5432
   POSTGRES_DB: postgres
@@ -11,29 +11,34 @@ services:
     build:
       context: ..
       dockerfile: docker/app/Dockerfile
-    container_name: rust-app
+    container_name: rust-db-libs-samples-app
     working_dir: /app
     command: bash
     tty: true
     environment:
       <<: *environment
-      POSTGRES_URL: "postgresql://postgresql:postgresql@postgresql:5432/postgresql"
+      DATABASE_URL: "postgres://docker:password@postgres:5432/postgres"
     volumes:
       - ../:/app
     ports:
       - 3000:3000
     depends_on:
       - postgres
+    networks:
+      - rust-db-libs-samples-network
   postgres:
     build:
       context: ..
       dockerfile: docker/db/Dockerfile
       target: 'postgres'
-    container_name: rust-postgres
+    container_name: rust-db-libs-samples-postgres
     ports:
       - "5433:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql/data
     environment: *environment
-volumes:
-  pgdata:
+    networks:
+      - rust-db-libs-samples-network
+networks:
+  rust-db-libs-samples-network:
+    driver: bridge
