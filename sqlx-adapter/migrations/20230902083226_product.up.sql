@@ -13,7 +13,7 @@ CREATE TABLE sqlx.product (
   id VARCHAR(36) NOT NULL,
   name varchar(20) NOT NULL DEFAULT '',
   price integer NOT NULL DEFAULT 0,
-  category_id BIGINT NOT NULL,
+  category_id VARCHAR(36) NOT NULL,
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT product_pk PRIMARY KEY (id),
