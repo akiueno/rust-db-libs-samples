@@ -5,7 +5,7 @@ use derive_new::new;
 pub struct NewProduct {
     name: String,
     price: i32,
-    category_id: i64,
+    category_id: Id<Product>,
 }
 
 impl NewProduct {
@@ -15,15 +15,16 @@ impl NewProduct {
     pub fn get_price(&self) -> i32 {
         self.price
     }
-    pub fn get_category_id(&self) -> i64 {
-        self.category_id
+    pub fn get_category_id(&self) -> &Id<Product> {
+        &self.category_id
     }
 }
 
+#[derive(Clone)]
 pub struct UpdateProduct {
     name: Option<String>,
     price: Option<i32>,
-    category_id: Option<i64>,
+    category_id: Option<Id<ProductCategory>>,
 }
 
 impl UpdateProduct {
@@ -33,12 +34,12 @@ impl UpdateProduct {
     pub fn get_price(&self) -> &Option<i32> {
         &self.price
     }
-    pub fn get_category_id(&self) -> &Option<i64> {
+    pub fn get_category_id(&self) -> &Option<Id<ProductCategory>> {
         &self.category_id
     }
 }
 
-#[derive(new)]
+#[derive(new, Clone)]
 pub struct Product {
     id: Id<Product>,
     name: String,

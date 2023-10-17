@@ -1,23 +1,24 @@
 use chrono::{DateTime, Local};
-use domain::model::{product::Product, Id};
+use domain::model::product::Product;
 
 #[derive(sqlx::FromRow)]
 pub(crate) struct ProductTable {
-    id: i64,
+    id: String,
     name: String,
     price: i32,
-    category_id: i64,
+    category_id: String,
     created_at: DateTime<Local>,
     updated_at: DateTime<Local>,
 }
 
-impl From<ProductTable> for Product {
-    fn from(source: ProductTable) -> Self {
-        Self::new(
-            Id::new(source.id),
+impl TryFrom<ProductTable> for Product {
+    type Error = anyhow::Error;
+    fn try_from(source: ProductTable) -> Result<Self, Self::Error> {
+        Ok(Self::new(
+            source.id.try_into()?,
             source.name,
             source.price,
-            Id::new(source.category_id),
-        )
+            source.category_id.try_into()?,
+        ))
     }
 }

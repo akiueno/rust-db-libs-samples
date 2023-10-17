@@ -16,12 +16,12 @@ impl ProductRepository for RepositoryForSqlx<Product> {
         )
         .bind(source.get_name())
         .bind(source.get_price())
-        .bind(source.get_category_id())
+        .bind(source.get_category_id().get_value().to_string())
         .fetch_one(&self.pool)
         .await
         .map_err(|e| RepositoryError::Unexpected(e.to_string()))?;
 
-        Ok(Product::from(product_table))
+        Ok(Product::try_from(product_table)?)
     }
 
     async fn find(&self, id: i32) -> anyhow::Result<Product> {
@@ -39,7 +39,7 @@ impl ProductRepository for RepositoryForSqlx<Product> {
             _ => RepositoryError::Unexpected(e.to_string()),
         })?;
 
-        Ok(Product::from(product_table))
+        Ok(Product::try_from(product_table)?)
     }
 
     async fn all(&self) -> anyhow::Result<Vec<Product>> {
@@ -53,7 +53,7 @@ impl ProductRepository for RepositoryForSqlx<Product> {
         .await
         .map_err(|e| RepositoryError::Unexpected(e.to_string()))?;
 
-        Ok(product_tables.into_iter().map(Product::from).collect())
+        product_tables.into_iter().map(Product::try_from).collect()
     }
 
     async fn update(&self, id: i32, source: UpdateProduct) -> anyhow::Result<Product> {
@@ -66,9 +66,21 @@ impl ProductRepository for RepositoryForSqlx<Product> {
             returning *
             "#,
         )
-        .bind(source.get_name().as_deref().unwrap_or(old_product.get_name()))
+        .bind(
+            source
+                .get_name()
+                .as_deref()
+                .unwrap_or(old_product.get_name()),
+        )
         .bind(source.get_price().unwrap_or(*old_product.get_price()))
-        .bind(source.get_category_id().unwrap_or(*old_product.get_category_id().get_value()))
+        .bind(
+            source
+                .get_category_id()
+                .clone()
+                .unwrap_or_else(|| old_product.get_category_id().clone())
+                .get_value()
+                .to_string(),
+        )
         .bind(id)
         .fetch_one(&self.pool)
         .await
@@ -77,7 +89,7 @@ impl ProductRepository for RepositoryForSqlx<Product> {
             _ => RepositoryError::Unexpected(e.to_string()),
         })?;
 
-        Ok(Product::from(updated_product))
+        Ok(Product::try_from(updated_product)?)
     }
 
     async fn delete(&self, id: i32) -> anyhow::Result<()> {

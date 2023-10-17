@@ -1,11 +1,31 @@
-use std::marker::PhantomData;
+use anyhow::anyhow;
 use derive_new::new;
+use std::marker::PhantomData;
+use ulid::Ulid;
 
 pub mod product;
 pub mod product_category;
 
-#[derive(new)]
+#[derive(new, Debug, Clone, Copy)]
 pub struct Id<T> {
-    pub value: i64,
+    pub value: Ulid,
     _marker: PhantomData<T>,
+}
+
+impl<T> Id<T> {
+    pub fn gen() -> Id<T> {
+        Id::new(Ulid::new())
+    }
+    pub fn get_value(&self) -> &Ulid {
+        &self.value
+    }
+}
+
+impl<T> TryFrom<String> for Id<T> {
+    type Error = anyhow::Error;
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        Ulid::from_string(&value)
+            .map(|id| Self::new(id))
+            .map_err(|err| anyhow!("{:?}", err))
+    }
 }
