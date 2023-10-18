@@ -6,3 +6,13 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+anyhow = "1.0.75"
+async-trait = "0.1.73"
+chrono = "0.4.28"
+derive-new = "0.5.9"
+domain = { path = "../domain" }
+sea-orm = { version = "0.12.3", features = ["sqlx-postgres","runtime-tokio-native-tls", "macros"] }
+serde = { version = "1.0.189", features = ["derive"]}
+serde_json = { version = "1.0.107", default-features = false, features = ["alloc"] }
+thiserror = "1.0.48"
+tokio = { version = "1.32.0", features = ["full"] }
