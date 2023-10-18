@@ -22,6 +22,7 @@ RUN set -eux; \
     cargo install cargo-watch cargo-make; \
     cargo install sqlx-cli --no-default-features --features postgres; \
     cargo install sea-orm-cli; \
+    rustup component add rustfmt; \
     cargo build --release; \
     chmod -R +x ./target/release/*;
 
