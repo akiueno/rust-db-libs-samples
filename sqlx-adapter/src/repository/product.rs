@@ -24,14 +24,14 @@ impl ProductRepository for RepositoryForSqlx<Product> {
         Ok(Product::try_from(product_table)?)
     }
 
-    async fn find(&self, id: i32) -> anyhow::Result<Product> {
+    async fn find(&self, id: String) -> anyhow::Result<Product> {
         let product_table = sqlx::query_as::<_, ProductTable>(
             r#"
             select * from sqlx.product
             where id = $1
             "#,
         )
-        .bind(id)
+        .bind(&id)
         .fetch_one(&self.pool)
         .await
         .map_err(|e| match e {
@@ -56,8 +56,8 @@ impl ProductRepository for RepositoryForSqlx<Product> {
         product_tables.into_iter().map(Product::try_from).collect()
     }
 
-    async fn update(&self, id: i32, source: UpdateProduct) -> anyhow::Result<Product> {
-        let old_product = self.find(id).await?;
+    async fn update(&self, id: String, source: UpdateProduct) -> anyhow::Result<Product> {
+        let old_product = self.find(id.clone()).await?;
         let updated_product = sqlx::query_as::<_, ProductTable>(
             r#"
             update sqlx.product
@@ -81,7 +81,7 @@ impl ProductRepository for RepositoryForSqlx<Product> {
                 .get_value()
                 .to_string(),
         )
-        .bind(id)
+        .bind(&id)
         .fetch_one(&self.pool)
         .await
         .map_err(|e| match e {
@@ -92,14 +92,14 @@ impl ProductRepository for RepositoryForSqlx<Product> {
         Ok(Product::try_from(updated_product)?)
     }
 
-    async fn delete(&self, id: i32) -> anyhow::Result<()> {
+    async fn delete(&self, id: String) -> anyhow::Result<()> {
         sqlx::query(
             r#"
             delete from sqlx.product
             where id = $1
             "#,
         )
-        .bind(id)
+        .bind(&id)
         .execute(&self.pool)
         .await
         .map_err(|e| match e {
