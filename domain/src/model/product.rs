@@ -1,11 +1,12 @@
 use super::{product_category::ProductCategory, Id};
 use derive_new::new;
 
-#[derive(new)]
+#[derive(new, Debug, Clone, PartialEq)]
 pub struct NewProduct {
+    id: Id<Product>,
     name: String,
     price: i32,
-    category_id: Id<Product>,
+    category_id: Id<ProductCategory>,
 }
 
 impl NewProduct {
@@ -15,12 +16,12 @@ impl NewProduct {
     pub fn get_price(&self) -> i32 {
         self.price
     }
-    pub fn get_category_id(&self) -> &Id<Product> {
+    pub fn get_category_id(&self) -> &Id<ProductCategory> {
         &self.category_id
     }
 }
 
-#[derive(Clone)]
+#[derive(new, Clone)]
 pub struct UpdateProduct {
     name: Option<String>,
     price: Option<i32>,
@@ -39,7 +40,7 @@ impl UpdateProduct {
     }
 }
 
-#[derive(new, Clone)]
+#[derive(new, Debug, Clone, PartialEq)]
 pub struct Product {
     id: Id<Product>,
     name: String,

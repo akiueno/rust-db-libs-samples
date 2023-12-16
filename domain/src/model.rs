@@ -6,7 +6,7 @@ use ulid::Ulid;
 pub mod product;
 pub mod product_category;
 
-#[derive(new, Debug, Clone, Copy)]
+#[derive(new, Debug, Clone, Copy, PartialEq)]
 pub struct Id<T> {
     pub value: Ulid,
     _marker: PhantomData<T>,

@@ -3,9 +3,10 @@ use std::sync::Arc;
 use super::{RepositoryError, RepositoryForSqlx};
 use crate::model::product::ProductTable;
 use async_trait::async_trait;
-use domain::model::product::{NewProduct, Product, UpdateProduct};
-use domain::model::Id;
-use domain::repository::product::ProductRepository;
+use domain::{
+    model::product::{NewProduct, Product, UpdateProduct},
+    repository::product::ProductRepository,
+};
 
 #[async_trait]
 impl ProductRepository for RepositoryForSqlx<Product> {
