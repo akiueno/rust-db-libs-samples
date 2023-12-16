@@ -63,8 +63,9 @@ impl ProductRepository for RepositoryForSqlx<Product> {
         product_tables.into_iter().map(Product::try_from).collect()
     }
 
-    async fn update(&self, id: String, source: UpdateProduct) -> anyhow::Result<Product> {
+    async fn update(&self, source: UpdateProduct) -> anyhow::Result<Product> {
         let pool = Arc::clone(&self.pool.0);
+        let id = source.get_id().get_value().to_string();
         let old_product = self.find(id.clone()).await?;
         let updated_product = sqlx::query_as::<_, ProductTable>(
             r#"
@@ -160,10 +161,12 @@ mod test {
 
         // update
         let updated_product = repository
-            .update(
-                product_id.value.to_string(),
-                UpdateProduct::new(Some(name.clone()), Some(1500), Some(category_id.clone())),
-            )
+            .update(UpdateProduct::new(
+                product_id.clone(),
+                Some(name.clone()),
+                Some(1500),
+                Some(category_id.clone()),
+            ))
             .await
             .unwrap();
         assert_eq!(

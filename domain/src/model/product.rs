@@ -10,6 +10,9 @@ pub struct NewProduct {
 }
 
 impl NewProduct {
+    pub fn get_id(&self) -> &Id<Product> {
+        &self.id
+    }
     pub fn get_name(&self) -> &str {
         &self.name
     }
@@ -23,12 +26,16 @@ impl NewProduct {
 
 #[derive(new, Clone)]
 pub struct UpdateProduct {
+    id: Id<Product>,
     name: Option<String>,
     price: Option<i32>,
     category_id: Option<Id<ProductCategory>>,
 }
 
 impl UpdateProduct {
+    pub fn get_id(&self) -> &Id<Product> {
+        &self.id
+    }
     pub fn get_name(&self) -> &Option<String> {
         &self.name
     }
