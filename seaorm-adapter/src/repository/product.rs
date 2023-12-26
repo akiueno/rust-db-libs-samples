@@ -88,3 +88,62 @@ impl RepositoryForSeaOrm<Product> {
         Ok(transaction)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::persistence::pool::Db;
+    use domain::model::Id;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn todo_crud_scenario() {
+        let product_id = Id::gen();
+        let name = "product name".to_string();
+        let price = 1000;
+        let category_id = Id::gen();
+        let expected_product =
+            Product::new(product_id.clone(), name.clone(), price, category_id.clone());
+
+        // create
+        let db = Db::new().await;
+        let repository = RepositoryForSeaOrm::new(db);
+        let created_product = repository
+            .create(NewProduct::new(
+                product_id.clone(),
+                name.clone(),
+                price,
+                category_id.clone(),
+            ))
+            .await
+            .unwrap();
+        assert_eq!(expected_product, created_product);
+
+        // find
+        let founded_product = repository.find(product_id.value.to_string()).await.unwrap();
+        assert_eq!(expected_product, founded_product);
+
+        // all
+        let products = repository.all().await.unwrap();
+        assert_eq!(vec![expected_product], products);
+
+        // update
+        let updated_product = repository
+            .update(UpdateProduct::new(
+                product_id.clone(),
+                Some(name.clone()),
+                Some(1500),
+                Some(category_id.clone()),
+            ))
+            .await
+            .unwrap();
+        assert_eq!(
+            Product::new(product_id.clone(), name.clone(), 1500, category_id.clone()),
+            updated_product
+        );
+
+        // delete
+        let res = repository.delete(product_id.value.to_string()).await;
+        assert!(res.is_ok())
+    }
+}
